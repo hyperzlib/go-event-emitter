@@ -36,6 +36,7 @@ func (l *Listener) Call(args []interface{}) (ret []reflect.Value, err error) {
 		}
 		if l.argTypes[index] != reflect.TypeOf(argument) {
 			err = fmt.Errorf("argument type mismatch at: %d", index)
+			return
 		}
 		argValues = append(argValues, reflect.ValueOf(argument))
 	}

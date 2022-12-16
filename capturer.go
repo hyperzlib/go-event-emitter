@@ -37,6 +37,7 @@ func (c *Capturer) Call(event EventType, args []interface{}) (ret []reflect.Valu
 		}
 		if c.argTypes[index] != reflect.TypeOf(argument) {
 			err = fmt.Errorf("argument type mismatch at: %d", index)
+			return
 		}
 		argValues = append(argValues, reflect.ValueOf(argument))
 	}
