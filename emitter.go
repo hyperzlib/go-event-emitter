@@ -62,20 +62,20 @@ func (em *Emitter) EmitEvent(event EventType, arguments ...interface{}) {
 func (em *Emitter) emitListenerEvents(listeners []*Listener, arguments []interface{}) {
 	for _, listener := range listeners {
 		if em.async {
-			go listener.handler(arguments...)
+			go listener.Call(arguments)
 			continue
 		}
-		listener.handler(arguments...)
+		listener.Call(arguments)
 	}
 }
 
 func (em *Emitter) emitCapturerEvents(capturers []*Capturer, event EventType, arguments []interface{}) {
 	for _, capturer := range capturers {
 		if em.async {
-			go capturer.handler(event, arguments...)
+			go capturer.Call(event, arguments)
 			continue
 		}
-		capturer.handler(event, arguments...)
+		capturer.Call(event, arguments)
 	}
 }
 
@@ -84,9 +84,7 @@ func (em *Emitter) AddListener(event EventType, handler HandleFunc) (listener *L
 	em.mu.Lock()
 	defer em.mu.Unlock()
 
-	listener = &Listener{
-		handler: handler,
-	}
+	listener = newEventFunc(handler)
 	em.listeners[event] = append(em.listeners[event], listener)
 	return listener
 }
@@ -96,9 +94,7 @@ func (em *Emitter) ListenOnce(event EventType, handler HandleFunc) (listener *Li
 	em.mu.Lock()
 	defer em.mu.Unlock()
 
-	listener = &Listener{
-		handler: handler,
-	}
+	listener = newEventFunc(handler)
 	em.listenersOnce[event] = append(em.listenersOnce[event], listener)
 	return listener
 }
@@ -108,9 +104,7 @@ func (em *Emitter) AddCapturer(handler CaptureFunc) (capturer *Capturer) {
 	em.mu.Lock()
 	defer em.mu.Unlock()
 
-	capturer = &Capturer{
-		handler: handler,
-	}
+	capturer = newCapturerFunc(handler)
 	em.capturers = append(em.capturers, capturer)
 	return capturer
 }

@@ -1,3 +1,3 @@
-module github.com/vansante/go-event-emitter
+module github.com/hyperzlib/go-event-emitter
 
 go 1.12
