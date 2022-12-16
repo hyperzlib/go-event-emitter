@@ -34,6 +34,9 @@ func (l *Listener) Call(args []interface{}) (ret []reflect.Value, err error) {
 		if index >= argLen {
 			break
 		}
+		if l.argTypes[index] != reflect.TypeOf(argument) {
+			err = fmt.Errorf("argument type mismatch at: %d", index)
+		}
 		argValues = append(argValues, reflect.ValueOf(argument))
 	}
 
@@ -51,9 +54,9 @@ func newEventFunc(f interface{}) *Listener {
 	}
 	ft := fv.Type()
 
-	argTypes := make([]reflect.Type, ft.NumIn()-1)
+	argTypes := make([]reflect.Type, ft.NumIn())
 	for i := range argTypes {
-		argTypes[i] = ft.In(i + 1)
+		argTypes[i] = ft.In(i)
 	}
 
 	if len(argTypes) == 0 {

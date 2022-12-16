@@ -29,10 +29,14 @@ func (c *Capturer) Call(event EventType, args []interface{}) (ret []reflect.Valu
 	}
 
 	argValues := make([]reflect.Value, 0)
+	argValues = append(argValues, reflect.ValueOf(event))
 
 	for index, argument := range args {
 		if index >= argLen {
 			break
+		}
+		if c.argTypes[index] != reflect.TypeOf(argument) {
+			err = fmt.Errorf("argument type mismatch at: %d", index)
 		}
 		argValues = append(argValues, reflect.ValueOf(argument))
 	}
@@ -51,7 +55,7 @@ func newCapturerFunc(f interface{}) *Capturer {
 	}
 	ft := fv.Type()
 
-	if ft.NumIn() < 1 || ft.In(0).Name() != "string" {
+	if ft.NumIn() < 1 || ft.In(0) != reflect.TypeOf("") {
 		panic("handler function should be like func(event EventType, ...)")
 	}
 
